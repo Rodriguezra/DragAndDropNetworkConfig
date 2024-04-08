@@ -304,7 +304,7 @@ function draw() {
     noStroke();
     fill(0);
     textAlign(CENTER, TOP); // Text alignment
-    text("The following image provided shows several US federal laws related to cybercrimes. Rearrange the list so that each law matches its correct description.", 30, 20, 600, 360);
+    text("Consider the given network configurations. With the top most configuration being most secure and the bottom most configuration the least secure, rank the network configurations. Be sure to consider the following aspects of secure design. Isolation - Separate system components into various containers. Least Common Mechanism - Minimize the functionality that is shared by different users.", 30, 20, 600, 360);
 
     // Learn More Button Border
     stroke(255);
