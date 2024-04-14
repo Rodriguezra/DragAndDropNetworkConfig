@@ -201,7 +201,8 @@ function setup() {
   netconfig = new Sprite(width / 2 - 80, 285);
   netconfig.addImage(netconfigImg);
   netconfig.collider = 'k';
-  netconfigImg.resize(300, 0);
+  netconfig.scale = 0.185;
+  //netconfigImg.resize(300, 0);
 
   cards = new Group();
   cards.collider = 'k';
@@ -266,7 +267,7 @@ function setup() {
   A.pos = { x: -100, y: -100 };
   B.pos = { x: -100, y: -100 };
   E.pos = { x: -100, y: -100 };
-  netconfig.pos = { x: -200, y: -200 };
+  netconfig.pos = { x: -400, y: -400 };
   Cybercrime.pos = { x: -400, y: -400 };
   lockedComp.pos = { x: -400, y: -400 };
   lockedComp.pos = { x: -400, y: -400 };
