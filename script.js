@@ -322,7 +322,7 @@ function draw() {
     text("Learn More", width - 80, height - 25);
 
     fill(c);
-    rect(20, 100, 620, 370, 10);
+    rect(20, 100, 620, 400, 10);
 
     fill(255);
     rect(40, 120, 310, 330, 10);
@@ -368,6 +368,10 @@ function draw() {
     line(365, center5.y, 440, center5.y);
     line(430, center5.y - 10, 440, center5.y);
     line(430, center5.y + 10, 440, center5.y);
+
+    line(365, center6.y, 440, center6.y);
+    line(430, center6.y - 10, 440, center6.y);
+    line(430, center6.y + 10, 440, center6.y);
 
     for (let card of cards) {
       handleDragging(card);
