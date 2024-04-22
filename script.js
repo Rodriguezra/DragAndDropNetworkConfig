@@ -1,3 +1,4 @@
+
 //Credits:
 //Button sample by Mellau via freesound.org
 //Card press sample by NenadSimic via freesound.org
@@ -41,14 +42,14 @@ function setCardsoffScreen() { //moves images based on which screen is displayed
   }
   else {
     Internet.pos = { x: -100000, y: -200 };
-  }if (screen === 3) {
+  } if (screen === 3) {
     lockedComp.pos = { x: width * .5, y: height * .5 };
   }
   else {
     lockedComp.pos = { x: -100000, y: -200 };
   }
   if (screen === 4) {
-    lockedOut.pos = { x: width * .5, y: height * .5};
+    lockedOut.pos = { x: width * .5, y: height * .5 };
   }
   else {
     lockedOut.pos = { x: -100000, y: -200 };
@@ -76,7 +77,7 @@ function mousePressed() {
       A.position = createVector(width * .25, height - 39);
       B.position = createVector(width * .35, height - 39);
       C.position = createVector(width * .45, height - 39);
-      D.position = createVector(width * .55, height - 39); 
+      D.position = createVector(width * .55, height - 39);
       E.position = createVector(width * .65, height - 39);
       F.position = createVector(width * .75, height - 39);
       netconfig.pos = { x: width * .28, y: height / 2 + 5 };
@@ -117,8 +118,7 @@ function mousePressed() {
   if (screen === 2) {
     cardPressed = true;
     // Check if the "Learn More" button is clicked
-    if (mouseX > width - 150 && mouseX < width - 10 && mouseY > height - 55 && mouseY < height - 20) 
-    {
+    if (mouseX > width - 150 && mouseX < width - 10 && mouseY > height - 55 && mouseY < height - 20) {
       buttonPress.play();
       // Display a link to a website for further learning
       window.open('https://cs.brown.edu/courses/cs227/archives/2001/groups/servers/chapter.pdf');
@@ -186,7 +186,7 @@ function snapToCenter(card) {
         card.position = center5;
         snapped = true;
         break;
-        case dist(card.x, card.y, center6.x, center6.y) < 40 && !cards.some(c => c != card && dist(c.x, c.y, center6.x, center6.y) < 40):
+      case dist(card.x, card.y, center6.x, center6.y) < 40 && !cards.some(c => c != card && dist(c.x, c.y, center6.x, center6.y) < 40):
         if (card.x != center6.x && card.y != center6.y) {
           cardSnap.play();
         }
@@ -243,7 +243,7 @@ function setup() {
   center2 = createVector(width * .8, height * .385);
   center3 = createVector(width * .8, height * .485);
   center4 = createVector(width * .8, height * .585);
-  center5 = createVector(width * .8, height * .685);
+  center5 = createVector(width * .8, height * .68);
   center6 = createVector(width * .8, height * .785);
 
   soundFormats('wav');
@@ -380,22 +380,22 @@ function draw() {
     noStroke();
     const g = color(0, 204, 0);
     fill(g);
-    circle (center1.x, center1.y, 45);
+    circle(center1.x, center1.y, 45);
     const gy = color(161, 215, 37);
     fill(gy);
-    circle (center2.x, center2.y, 45);
+    circle(center2.x, center2.y, 45);
     const y = color(255, 222, 0);
     fill(y);
-    circle (center3.x, center3.y, 45);
+    circle(center3.x, center3.y, 45);
     const lo = color(255, 196, 0);
     fill(lo);
-    circle (center4.x, center4.y, 45);
+    circle(center4.x, center4.y, 45);
     const o = color(255, 119, 0);
     fill(o);
-    circle (center5.x, center5.y, 45);
+    circle(center5.x, center5.y, 45);
     const r = color(195, 16, 16);
     fill(r);
-    circle (center6.x, center6.y, 45);
+    circle(center6.x, center6.y, 45);
 
     fill(0);
     noStroke();
@@ -494,7 +494,7 @@ function windowResized() { //Adjusts size of canvas and screen elements based on
   center2 = createVector(width * .8, height * .385);
   center3 = createVector(width * .8, height * .485);
   center4 = createVector(width * .8, height * .585);
-  center5 = createVector(width * .8, height * .685);
+  center5 = createVector(width * .8, height * .68);
   center6 = createVector(width * .8, height * .785);
 }
 
