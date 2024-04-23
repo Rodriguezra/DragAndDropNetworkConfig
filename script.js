@@ -1,4 +1,3 @@
-
 //Credits:
 //Button sample by Mellau via freesound.org
 //Card press sample by NenadSimic via freesound.org
@@ -207,8 +206,15 @@ function snapToCenter(card) {
 function checkIfConfirm() { //submit screen appears if all 5 cards have been snapped to a position
   let numSnapped = 0;
   for (let card of cards) {
-    if ((card.x == center1.x && card.y == center1.y) || (card.x == center2.x && card.y == center2.y) || (card.x == center3.x && card.y == center3.y) || (card.x == center4.x && card.y == center4.y) || (card.x == center5.x && card.y == center5.y) || (card.x == center6.x && card.y == center6.y)) {
-      numSnapped++;
+    if (
+      dist(card.x, card.y, center1.x, center1.y) < 1 ||
+      dist(card.x, card.y, center2.x, center2.y) < 1 ||
+      dist(card.x, card.y, center3.x, center3.y) < 1 ||
+      dist(card.x, card.y, center4.x, center4.y) < 1 ||
+      dist(card.x, card.y, center5.x, center5.y) < 1 ||
+      dist(card.x, card.y, center6.x, center6.y) < 1
+    ) {
+        numSnapped++;
     }
   }
   if (numSnapped == 6) {
@@ -243,7 +249,7 @@ function setup() {
   center2 = createVector(width * .8, height * .385);
   center3 = createVector(width * .8, height * .485);
   center4 = createVector(width * .8, height * .585);
-  center5 = createVector(width * .8, height * .68);
+  center5 = createVector(width * .8, height * .685);
   center6 = createVector(width * .8, height * .785);
 
   soundFormats('wav');
@@ -352,17 +358,17 @@ function draw() {
     strokeWeight(1);
     fill(255);
     rectMode(CENTER);
-    rect(width / 2, 60, 1000, 100, 10);
+    rect(width / 2, 60, width - 500, height * .15, 10);
     rectMode(CORNER);
     rect(200, 120, width - 400, height - 200, 10);
     // Define the text content
     // Set text properties
     // Display text content
-    textSize(15);
+    textSize(width * height * 0.000013);
     noStroke();
     fill(0);
     textAlign(CENTER, TOP); // Text alignment
-    text("Consider the given network configurations. With the top-most configuration being most secure and the bottom-most configuration being the least secure, rank the network configurations. Be sure to consider the following aspects of secure design. Isolation - Separate system components into various containers. Least Common Mechanism - Minimize the functionality that is shared by different users.", width / 2 - 500, 20, 1000, 360);
+    text("Consider the given network configurations. With the top-most configuration being most secure and the bottom-most configuration being the least secure, rank the network configurations. Be sure to consider the following aspects of secure design. Isolation - Separate system components into various containers. Least Common Mechanism - Minimize the functionality that is shared by different users.", width / 2 - 500, height / 35, 1000, 360);
 
     // Learn More Button Border
     stroke(255);
@@ -380,26 +386,26 @@ function draw() {
     noStroke();
     const g = color(0, 204, 0);
     fill(g);
-    circle(center1.x, center1.y, 45);
+    circle(center1.x, center1.y, width * height * .000046);
     const gy = color(161, 215, 37);
     fill(gy);
-    circle(center2.x, center2.y, 45);
+    circle(center2.x, center2.y, width * height * .000046);
     const y = color(255, 222, 0);
     fill(y);
-    circle(center3.x, center3.y, 45);
+    circle(center3.x, center3.y, width * height * .000046);
     const lo = color(255, 196, 0);
     fill(lo);
-    circle(center4.x, center4.y, 45);
+    circle(center4.x, center4.y, width * height * .000046);
     const o = color(255, 119, 0);
     fill(o);
-    circle(center5.x, center5.y, 45);
+    circle(center5.x, center5.y, width * height * .000046);
     const r = color(195, 16, 16);
     fill(r);
-    circle(center6.x, center6.y, 45);
+    circle(center6.x, center6.y, width * height * .000046);
 
     fill(0);
     noStroke();
-    textSize(24);
+    textSize(width * height * 0.000023);
     textAlign(CENTER);
     textFont('Courier New');
     text("1", center1.x, center1.y + 2);
@@ -494,7 +500,7 @@ function windowResized() { //Adjusts size of canvas and screen elements based on
   center2 = createVector(width * .8, height * .385);
   center3 = createVector(width * .8, height * .485);
   center4 = createVector(width * .8, height * .585);
-  center5 = createVector(width * .8, height * .68);
+  center5 = createVector(width * .8, height * .685);
   center6 = createVector(width * .8, height * .785);
 }
 
@@ -511,12 +517,12 @@ function showStartScreen() {
 
   fill(255);
   rectMode(CENTER);
-  rect(width / 2, height / 8, 1100, height / 10, 10);
+  rect(width / 2, height / 8, width * .75, height / 10, 10);
   rectMode(CORNER);
 
   // Set text properties
   fill(0); // Black color
-  textSize(60); // Font size
+  textSize(width * height * 0.000059); // Font size
   textFont(font);
   textAlign(CENTER, CENTER); // Text alignment
   text("Network Configuration\n\n", width / 2, height / 4.5);
