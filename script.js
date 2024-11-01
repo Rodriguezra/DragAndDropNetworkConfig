@@ -11,10 +11,11 @@ let buttonPress, cardPress, cardSnap, gameMusic, winJingle;
 let netconfig, F, C, D, A, B, E, Internet, lockedComp, lockedOut, Chip;
 let netconfigImg, FImg, CImg, DImg, AImg, BImg, EImg, InternetImg, LockedComputerImg, LockedOutImg, ChipImg;
 let center1, center2, center3, center4, center5, center6;
+let slider, sliderY, volume0Img, volume1Img, gameAmp, effectAmp, muted, prevAmp;
 let screen = 0;
 let widthConstraint, heightConstraint;
-let alphaValue = 0;
-let fadeSpeed = 5;
+let alphaValue = 255;
+let fadeSpeed = -1.5;
 let confirm = false;
 let cancel = false;
 let cardPressed = false;
@@ -123,6 +124,10 @@ function mousePressed() {
       window.open('https://cs.brown.edu/courses/cs227/archives/2001/groups/servers/chapter.pdf');
     }
   }
+
+    // mute button pressed
+    let buttonCenterDist = dist(mouseX, mouseY, 40, height - 40);
+    if (buttonCenterDist < 25) { muted = !muted; }
 }
 
 
@@ -224,6 +229,7 @@ function checkIfConfirm() { //submit screen appears if all 5 cards have been sna
 
 function preload() { //loads fonts, images, and sounds
   font = loadFont('assets/NetConfig/1/MechaRx20Regular-j9Zy9.otf');
+  font2 = loadFont('assets/NetConfig/1/Metropolis-Regular.otf');
   netconfigImg = loadImage('assets/NetConfig/1/netconfig.png');
   FImg = loadImage('assets/NetConfig/1/F.png');
   CImg = loadImage('assets/NetConfig/1/C.png');
@@ -240,6 +246,8 @@ function preload() { //loads fonts, images, and sounds
   cardSnap = loadSound('assets/NetConfig/1/cardSnap.wav');
   gameMusic = loadSound('assets/NetConfig/1/gameMusic.wav');
   winJingle = loadSound('assets/NetConfig/1/winJingle.wav');
+  volume0Img = loadImage('assets/NetConfig/1/volume0.png');
+  volume1Img = loadImage('assets/NetConfig/1/volume1.png');
 }
 
 function setup() {
@@ -328,6 +336,22 @@ function setup() {
   lockedComp.pos = { x: -400, y: -400 };
   lockedComp.pos = { x: -400, y: -400 };
   Chip.pos = { x: -400, y: -400 };
+
+    // adjust volumes
+    gameAmp = 0.15;
+    effectAmp = 0.5;
+
+    gameMusic.amp(gameAmp);
+    buttonPress.amp(effectAmp);
+    cardPress.amp(effectAmp);
+    cardSnap.amp(effectAmp);
+    winJingle.amp(effectAmp);
+
+    // set up volume control
+    slider = createSlider(0, 1, 1, 0);
+    muted = false;
+    prevAmp = 1;
+    sliderY = height + 10;
 }
 
 
@@ -344,45 +368,222 @@ function draw() {
     showInstructionScreen();
   }
   else if (screen === 2) {
-    playOnce = true;
+      showGameScreen();
+  }
+
+    // if all blanks are filled, ask to submit
+    checkIfConfirm();
+
+    //Check if we win!!!
+    if (confirm && !cancel) {
+
+        // submit back text
+        rectMode(CORNER)
+        const c = color(0, 179, 115);
+        fill(255);
+        noStroke();
+        rect(width / 2 - 140, height - 130, 300, 110, 10);
+
+        fill(0);
+        textSize(20);
+        textAlign(LEFT);
+        text('Submit Answer?', width / 2 - 95, height - 105);
+
+        // submit button
+        fill(c);
+        rect(width / 2 + 20, height - 80, 120, 40, 10);
+
+        fill(255);
+        textSize(17);
+        text("Submit", width / 2 + 42, height - 60);
+
+        // cancel button
+        const r = color(195, 16, 16);
+        fill(r);
+        rect(width / 2 - 120, height - 80, 120, 40, 10);
+
+        fill(255);
+        text("Cancel", width / 2 - 105, height - 60);
+    }
+
+  else if (screen === 3) {
+    showScreenWin();
+  }
+
+  else if (screen === 4) {
+    showScreenLose();
+  }
+
+    volumeControl();
+}
+
+function windowResized() { //Adjusts size of canvas and screen elements based on screen size 
+  resizeCanvas(windowWidth, windowHeight);
+  netconfig.scale = .000165 * width;
+  netconfig.pos = { x: width * .28, y: height / 2 + 5 };
+  F.scale = 0.000425 * width;
+  F.originalPosition = createVector(width * .75, height - 39);
+  C.scale = 0.000425 * width;
+  C.originalPosition = createVector(width * .45, height - 39);
+  D.scale = 0.000425 * width;
+  D.originalPosition = createVector(width * .55, height - 39);
+  A.scale = 0.000425 * width;
+  A.originalPosition = createVector(width * .25, height - 39);
+  B.scale = 0.000425 * width;
+  B.originalPosition = createVector(width * .35, height - 39);
+  E.scale = 0.000425 * width;
+  E.originalPosition = createVector(width * .65, height - 39);
+  center1 = createVector(width * .8, height * .285);
+  center2 = createVector(width * .8, height * .385);
+  center3 = createVector(width * .8, height * .485);
+  center4 = createVector(width * .8, height * .585);
+  center5 = createVector(width * .8, height * .685);
+  center6 = createVector(width * .8, height * .785);
+}
+
+function showStartScreen() {
+    // set background
+    setCardsoffScreen();
     const c = color(48, 116, 180);
     background(c);
 
+    // load background image
     let imgX = 0;
     let imgY = 0;
     scale(.00016 * width);
     image(ChipImg, imgX, imgY);
     scale(1 / (.00016 * width));
 
+    // back of center image
+    rectMode(CENTER);
+    fill(255);
+    rect(width / 2, height / 2, width * .21, height * .5, 10);
+
+    // title text
+    fill(255);
+    rect(width / 2, height / 8, 1100, height / 10, 10);
+
+    fill(0); // Black color
+    textSize(60);
+    textFont(font);
+    textAlign(CENTER, CENTER); // Text alignment
+    text("Network Configuration", width / 2, height / 8);
+
+    // Play button
+    fill(255);
     noStroke();
-    strokeWeight(1);
+    rect(width / 2, height - 100, 200, 40, 10);
+
+    fill(0);
+    textSize(20);
+    text("Play", width / 2, height - 100);
+}
+
+
+function showInstructionScreen() {
+    // set background
+    setCardsoffScreen();
+    background("white");
+
+    // load background image
+    let imgX = 0;
+    let imgY = 0;
+    scale(.00016 * width);
+    image(ChipImg, imgX, imgY);
+    scale(1 / (.00016 * width));
+
+    // title text
+    fill(0);
+    textFont(font);
+    rectMode(CENTER);
+    rect(width / 2, height / 4 + 10, 600, height / 10, 10);
+
+    const c = color(48, 116, 180);
+
+    // Set text properties
+    fill(c); // Blue color
+    textSize(32); // Font size
+    textAlign(CENTER, CENTER); // Text alignment
+    textFont(font);
+    text("Instructions", width / 2, height / 4 + 10);
+
+    // Begin button
+    fill(0);
+    rect(width / 2, height - 100, 200, 40, 10);
+
+    fill(255);
+    textSize(20);
+    text("Begin", width / 2, height - 100);
+
+    // instructions text
+    textSize(20); // Adjusted font size
+    textAlign(CENTER, CENTER); // Adjusted text alignment
+
+    fill(color(0));
+    textFont(font2); // change font
+    let textX = width / 2; // X position for the additional text
+    let textY = height / 2 + 85; // Starting Y position for the additional text
+    let textLeading = 24; // Line spacing
+    let textWidth = 465; // Width of the text block
+    let additionalText = "Your objective is to correctly place each card into its designated slot.\n\nTo play, click and hold on a card, then drag it to the numbered slot where you think it belongs.\n\nRelease the mouse to drop the card into place.\n\nWhen all cards have been placed, you'll see an option to check your answers.\n\nIf you're correct, you'll have the option to \nplay again.";
+
+    text(additionalText, textX, textY, textWidth, height); // Display additional text with specified width and height
+}
+
+function showGameScreen() {
+    playOnce = true;
+
+    // set background
+    const c = color(48, 116, 180);
+    background(c);
+
+    // load background image
+    let imgX = 0;
+    let imgY = 0;
+    scale(.00016 * width);
+    image(ChipImg, imgX, imgY);
+    scale(1 / (.00016 * width));
+
+    // center image rectangle
     fill(255);
     rectMode(CENTER);
-    rect(width / 2, 60, width - 500, height * .15, 10);
-    rectMode(CORNER);
-    rect(200, 120, width - 400, height - 200, 10);
-    // Define the text content
-    // Set text properties
+    rect(width / 2, height / 2 + 15, width / 1.2, height / 1.50, 10);
+
+    // game text
+    noStroke();
+    strokeWeight(1);
+    rectMode(CENTER);
+    rect(width / 2, 80, 1000, 150, 10);
+
     // Display text content
-    textSize(width * height * 0.000013);
+    textSize(18);
     noStroke();
     fill(0);
-    textAlign(CENTER, TOP); // Text alignment
-    text("Consider the given network configurations. With the top-most configuration being most secure and the bottom-most configuration being the least secure, rank the network configurations. Be sure to consider the following aspects of secure design. Isolation - Separate system components into various containers. Least Common Mechanism - Minimize the functionality that is shared by different users.", width / 2 - 500, height / 35, 1000, 360);
+    textAlign(CENTER, CENTER); // Text alignment
+    textFont(font2);
+    text("Rank the given network configurations, green (1) being most secure and red (6) being the least secure.\n\nBe sure to consider the following aspects of secure design:\n\nIsolation - Separate system components into various containers.\nLeast Common Mechanism - Minimize the functionality that is shared by different users."
+        , width / 2, 80, 900, 360);
 
-    // Learn More Button Border
-    stroke(255);
-    strokeWeight(2);
-    fill(255);
     // Learn More Button
     noStroke();
     fill(255);
-    rect(width - 150 + 1, height - 54, 138, 38, 10);
+    rect(width - 80, height - 35, 138, 38, 10);
+
     fill(0);
     textSize(16);
     textAlign(CENTER, CENTER);
+    textFont(font);
     text("Learn More", width - 80, height - 35);  // Learn More Button Text
 
+    fill(255);
+    noStroke();
+
+    fill(0);
+    noStroke();
+    textSize(24);
+    textAlign(CENTER);
+
+    // numbered circles
     noStroke();
     const g = color(0, 204, 0);
     fill(g);
@@ -416,6 +617,7 @@ function draw() {
     text("6", center6.x, center6.y + 2);
     textFont(font);
 
+    // arrows
     strokeWeight(5);
     stroke(0);
     line(center1.x * .6, center1.y, center1.x * .9, center1.y);
@@ -442,234 +644,191 @@ function draw() {
     line(center6.x * .88, center6.y - 20, center6.x * .9, center6.y);
     line(center6.x * .88, center6.y + 20, center6.x * .9, center6.y);
 
+    strokeWeight(0);
+
     for (let card of cards) {
-      handleDragging(card);
-      snapToCenter(card);
+        handleDragging(card);
+        snapToCenter(card);
     }
-  }
-
-  checkIfConfirm();
-  //Check if we win!!!
-  if (confirm && !cancel) {
-    const c = color(0, 179, 115);
-    fill(255);
-    noStroke();
-    rect(width / 2 - 140, height - 130, 300, 110, 10);
-    fill(0);
-    textSize(20);
-    textAlign(LEFT);
-    text('Submit Answer?', width / 2 - 95, height - 105);
-    fill(c);
-    rect(width / 2 + 20, height - 80, 120, 40, 10);
-    fill(255);
-    textSize(17);
-    text("Submit", width / 2 + 42, height - 60);
-    const r = color(195, 16, 16);
-    fill(r);
-    rect(width / 2 - 120, height - 80, 120, 40, 10);
-    fill(255);
-    text("Cancel", width / 2 - 105, height - 60);
-  }
-
-  else if (screen === 3) {
-    showScreenWin();
-  }
-
-  else if (screen === 4) {
-    showScreenLose();
-  }
-}
-
-function windowResized() { //Adjusts size of canvas and screen elements based on screen size 
-  resizeCanvas(windowWidth, windowHeight);
-  netconfig.scale = .000165 * width;
-  netconfig.pos = { x: width * .28, y: height / 2 + 5 };
-  F.scale = 0.000425 * width;
-  F.originalPosition = createVector(width * .75, height - 39);
-  C.scale = 0.000425 * width;
-  C.originalPosition = createVector(width * .45, height - 39);
-  D.scale = 0.000425 * width;
-  D.originalPosition = createVector(width * .55, height - 39);
-  A.scale = 0.000425 * width;
-  A.originalPosition = createVector(width * .25, height - 39);
-  B.scale = 0.000425 * width;
-  B.originalPosition = createVector(width * .35, height - 39);
-  E.scale = 0.000425 * width;
-  E.originalPosition = createVector(width * .65, height - 39);
-  center1 = createVector(width * .8, height * .285);
-  center2 = createVector(width * .8, height * .385);
-  center3 = createVector(width * .8, height * .485);
-  center4 = createVector(width * .8, height * .585);
-  center5 = createVector(width * .8, height * .685);
-  center6 = createVector(width * .8, height * .785);
-}
-
-function showStartScreen() {
-  setCardsoffScreen();
-  const c = color(48, 116, 180);
-  background(c);
-
-  let imgX = 0;
-  let imgY = 0;
-  scale(.00016 * width);
-  image(ChipImg, imgX, imgY);
-  scale(1 / (.00016 * width));
-
-  fill(255);
-  rectMode(CENTER);
-  rect(width / 2, height / 8, width * .75, height / 10, 10);
-  rectMode(CORNER);
-
-  // Set text properties
-  fill(0); // Black color
-  textSize(width * height * 0.000059); // Font size
-  textFont(font);
-  textAlign(CENTER, CENTER); // Text alignment
-  text("Network Configuration\n\n", width / 2, height / 4.5);
-
-  // Instructions button
-  fill(255);
-  noStroke();
-  rect(width / 2 - 100, height - 120, 200, 40, 10);
-  fill(0);
-  textSize(20);
-  text("Instructions", width / 2, height - 100);
-
-  fill(255);
-  rect(width * .395, height * .25, width * .21, height * .5, 10);
-}
-
-
-function showInstructionScreen() {
-  setCardsoffScreen();
-  background("white");
-
-  let imgX = 0;
-  let imgY = 0;
-  scale(.00016 * width);
-  image(ChipImg, imgX, imgY);
-  scale(1 / (.00016 * width));
-
-  fill(0);
-  rectMode(CENTER);
-  rect(width / 2, height / 3.25, 600, height / 10, 10);
-  rectMode(CORNER);
-
-  const c = color(48, 116, 180);
-  // Set text properties
-  fill(c); // Blue color
-  textSize(32); // Font size
-  textAlign(CENTER, CENTER); // Text alignment
-  text("Instructions\n\n", width / 2, height * .36);
-
-  // Begin button
-  fill(0);
-  rect(width / 2 - 100, height - 120, 200, 40, 10);
-  fill(255);
-  textSize(20);
-  text("Begin", width / 2, height - 100);
-
-
-  textSize(18); // Adjusted font size
-  textAlign(CENTER, TOP); // Adjusted text alignment
-
-  // Additional text
-  fill(color(0));
-  let textX = width / 2 - 280; // X position for the additional text
-  let textY = height / 2 - 60; // Starting Y position for the additional text
-  let textLeading = 24; // Line spacing
-  let textWidth = 575; // Width of the text block
-  let additionalText = "Your objective is to correctly place each card into its designated slot. To play, click and hold on a card, then drag it to the slot where you think it belongs. Release the mouse to drop the card into place.\n\nRemember, each card has a specific slot it must occupy. When all cards have been placed, you'll see an option to check your answers. If you're correct, you'll have the option to play again.";
-
-  text(additionalText, textX, textY, textWidth, height - textY); // Display additional text with specified width and height
 }
 
 function showScreenWin() {
-  if (playOnce) {
-    gameMusic.stop();
-    winJingle.loop();
-  }
-  playOnce = false;
-  const c = color(0, 179, 115);
-  background(c);
-  //Move extra icons off screen when win page is up
-  setCardsoffScreen();
+    if (playOnce) {
+        gameMusic.stop();
+        winJingle.play();
+    }
 
-  let imgX = 0;
-  let imgY = 0;
-  scale(.00016 * width);
-  image(ChipImg, imgX, imgY);
-  scale(1 / (.00016 * width));
+    playOnce = false;
 
-  fill(255);
-  rect(width * .33, height * .33, width * .35, height * .48, 10);
+    // set background
+    setCardsoffScreen();
+    const c = color(0, 179, 115);
+    background(c);
 
-  //Set text properties
-  fill(255, alphaValue);
-  rect(width * .34, height * .1, width * .33, height * .2, 10);
-  fill(0, alphaValue);
-  textSize(32);
-  textAlign(CENTER, CENTER);
-  text("You Win!\n\nThanks for playing!", width / 2, height * .2);
+    // load background image
+    let imgX = 0;
+    let imgY = 0;
+    scale(.00016 * width);
+    image(ChipImg, imgX, imgY);
+    scale(1 / (.00016 * width));
 
-  //Animate alpha value for fading effect
-  alphaValue += fadeSpeed;
-  if (alphaValue > 255 || alphaValue < 0) {
-    fadeSpeed *= -1; //Reverse the fade direction
-  }
+    //display win image
+    fill(255);
+    rectMode(CORNER);
+    rect(width * .33, height * .33, width * .35, height * .48, 10);
 
-  //Restart button
-  fill(255);
-  rect(width / 2 - 100, height - 120, 200, 40, 10);
-  fill(0);
-  textSize(20);
-  text("Restart", width / 2, height - 100);
+    let imgX2 = lockedComp.width + 14;
+    let imgY2 = lockedComp.height - 55;
+    scale(.00095 * width);
+    image(LockedComputerImg, imgX2, imgY2);
+    scale(1 / (.00095 * width));
 
-  //display win image
-  let imgX2 = lockedComp.width + 14;
-  let imgY2 = lockedComp.height - 55;
-  scale(.00095 * width);
-  image(LockedComputerImg, imgX2, imgY2);
+    // win title text
+    fill(255, alphaValue);
+    rectMode(CENTER);
+    rect(width / 2, height * .2, width * .33, height * .2, 10);
+
+    fill(0, alphaValue);
+    textSize(32);
+    textAlign(CENTER, CENTER);
+    textFont(font);
+    text("You Win!\n\nThanks for playing!", width / 2, height * .2);
+
+    //Animate alpha value for fading effect
+    alphaValue += fadeSpeed;
+    if (alphaValue >= 255 || alphaValue <= 140) {
+        fadeSpeed *= -1; //Reverse the fade direction
+    }
+
+    //Restart button
+    fill(255);
+    rect(width / 2, height - 100, 200, 40, 10);
+
+    fill(0);
+    textSize(20);
+    text("Restart", width / 2, height - 100);
 }
 
 function showScreenLose() {
-  setCardsoffScreen();
-  const r = color(195, 16, 16);
-  background(r);
+    // set background
+    setCardsoffScreen();
+    const r = color(195, 16, 16);
+    background(r);
 
-  let imgX = 0;
-  let imgY = 0;
-  scale(.00016 * width);
-  image(ChipImg, imgX, imgY);
-  scale(1 / (.00016 * width));
+    // load background image
+    let imgX = 0;
+    let imgY = 0;
+    scale(.00016 * width);
+    image(ChipImg, imgX, imgY);
+    scale(1 / (.00016 * width));
 
-  fill(255);
-  rect(width * .33, height * .33, width * .35, height * .48, 10);
+    //display lose image
+    fill(255);
+    rectMode(CORNER);
+    rect(width * .33, height * .33, width * .35, height * .48, 10);
 
-  //Set text properties
-  fill(255, alphaValue);
-  rect(width * .4, height * .1, width * .2, height * .2, 10);
-  fill(0, alphaValue);
-  textSize(32);
-  textAlign(CENTER, CENTER);
-  text("Not Quite!\n\nTry again?", width / 2, height * .2);
+    let imgX2 = lockedOut.width + 20;
+    let imgY2 = lockedOut.height - 20;
+    scale(.001 * width);
+    image(LockedOutImg, imgX2, imgY2);
+    scale(1 / (.001 * width));
 
-  //Animate alpha value for fading effect
-  alphaValue += fadeSpeed;
-  if (alphaValue > 255 || alphaValue < 0) {
-    fadeSpeed *= -1; //Reverse the fade direction
-  }
+    //Set title text
+    fill(255, alphaValue);
+    rectMode(CENTER);
+    rect(width / 2, height * .2, width * .2, height * .2, 10);
 
-  //Restart button
-  fill(255);
-  rect(width / 2 - 100, height - 120, 200, 40, 10);
-  fill(0);
-  textSize(20);
-  text("Restart", width / 2, height - 100);
+    fill(0, alphaValue);
+    textSize(32);
+    textAlign(CENTER, CENTER);
+    textFont(font);
+    text("Not Quite!\n\nTry again?", width / 2, height * .2);
 
-  //display lose image
-  let imgX2 = lockedOut.width + 20;
-  let imgY2 = lockedOut.height - 20;
-  scale(.001 * width);
-  image(LockedOutImg, imgX2, imgY2);
+    //Animate alpha value for fading effect
+    alphaValue += fadeSpeed;
+    if (alphaValue >= 255 || alphaValue <= 140) {
+        fadeSpeed *= -1; //Reverse the fade direction
+    }
+
+    //Restart button
+    fill(255);
+    rect(width / 2, height - 100, 200, 40, 10);
+
+    fill(0);
+    textSize(20);
+    text("Restart", width / 2, height - 100);
+}
+
+function volumeControl() {
+    // mute button
+    fill(0);
+    circle(40, height - 40, 50);
+
+    fill(235);
+    circle(40, height - 40, 44);
+
+    // button images
+    let x = 990;
+    let y = 34250;
+
+    if (muted) {
+        scale(.000013 * width);
+        image(volume0Img, x, y);
+        scale(1 / (.000013 * width));
+    }
+    else {
+        scale(.000013 * width);
+        image(volume1Img, x, y);
+        scale(1 / (.000013 * width));
+    }
+
+    // volume slider movement
+    let buttonCenterDist = dist(mouseX, mouseY, 40, height - 40);
+
+    if (sliderY > height - 50 && mouseX < 250 && mouseY > height - 80) { // mouse in general area
+        sliderY -= 5;
+    }
+    else if (sliderY <= height + 10 && (mouseX >= 250 || mouseY <= height - 80)) { // mouse outside general area
+        sliderY += 5;
+    }
+
+    // volume slider
+    slider.position(90, sliderY);
+
+    fill(0);
+    circle(95, sliderY + 10, 30);
+    circle(220, sliderY + 10, 30);
+    rectMode(CENTER);
+    rect(157.5, sliderY + 10, 125, 30);
+
+    fill(235);
+    circle(95, sliderY + 10, 24);
+    circle(220, sliderY + 10, 24);
+    rectMode(CENTER);
+    rect(157.5, sliderY + 10, 125, 24);
+
+    // slider volume logic
+    let currAmp = slider.value();
+
+    // if the slider is moved while muted, unmute
+    if (muted && (prevAmp != currAmp)) { muted = false; }
+
+    if (currAmp <= 0) { muted = true; }
+
+    if (!muted) {
+        gameMusic.amp(gameAmp * currAmp);
+        buttonPress.amp(effectAmp * currAmp);
+        cardPress.amp(effectAmp * currAmp);
+        cardSnap.amp(effectAmp * currAmp);
+        winJingle.amp(effectAmp * currAmp);
+    }
+    else {
+        gameMusic.amp(0);
+        buttonPress.amp(0);
+        cardPress.amp(0);
+        cardSnap.amp(0);
+        winJingle.amp(0);
+    }
+
+    prevAmp = currAmp;
 }
